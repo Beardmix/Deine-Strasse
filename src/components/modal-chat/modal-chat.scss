@@ -1,0 +1,13 @@
+modal-chat {
+    .content {
+        position: relative;
+        .currentUser {
+            text-align: right;
+            background-color: color($colors, light, base)
+        }
+        .otherUser {
+            text-align: left;
+            background-color: color($colors, primarylight, base)
+        }
+    }
+}

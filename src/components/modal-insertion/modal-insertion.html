@@ -1,0 +1,35 @@
+<ion-toolbar>
+    <!-- <ion-title>{{insertion.title}}</ion-title> -->
+    <ion-buttons end>
+        <button nav-pop>
+            <ion-icon [name]="'close'" (click)="closeModal()"></ion-icon>
+        </button>
+    </ion-buttons>
+</ion-toolbar>
+<ion-content padding>
+    <ion-item>
+        <ion-avatar item-start>
+            <img src="assets/img/offerIcon.png" [hidden]="insertion.type=='public'">
+            <img src="assets/img/publicIcon.png" [hidden]="insertion.type!='public'">
+        </ion-avatar>
+        <h1>{{insertion.title}}</h1>
+        <p>Last update: {{updateDate}}</p>
+    </ion-item>
+    <ion-card-content>
+        <p>{{insertion.description}}</p>
+    </ion-card-content>
+    <ion-item>
+        <ion-avatar item-start>
+            <img src="assets/img/profile.png" [hidden]="profile.lowres_img_url">
+            <img [src]="profile.lowres_img_url" [hidden]="!profile.lowres_img_url">
+        </ion-avatar>
+        <h2>{{profile.name}}</h2>
+        <p>Distance: {{distance}}</p>
+    </ion-item>
+    <div id="contact">
+        <button ion-button icon-left round outline (click)="startChat()">
+            <ion-icon name="text"></ion-icon>
+            <div>Contact</div>
+        </button>
+    </div>
+</ion-content>

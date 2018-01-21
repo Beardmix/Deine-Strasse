@@ -1,0 +1,23 @@
+<ion-toolbar>
+    <ion-title>{{viewTitle}}</ion-title>
+    <ion-buttons end>
+        <button nav-pop>
+      <ion-icon [name]="'close'" (click)="closeModal()"></ion-icon>
+    </button>
+    </ion-buttons>
+</ion-toolbar>
+<ion-content padding>
+    <ion-list>
+        <ion-item>
+            <ion-label color="primary" stacked>Title</ion-label>
+            <ion-input placeholder="Enter a title" [(ngModel)]="insertion.title"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label color="primary" stacked>Description</ion-label>
+            <ion-textarea placeholder="Enter a description" [(ngModel)]="insertion.description"></ion-textarea>
+        </ion-item>
+        <button ion-button icon-only (click)="addInsertion()">
+            <ion-icon name="md-checkmark"></ion-icon>
+        </button>
+    </ion-list>
+</ion-content>

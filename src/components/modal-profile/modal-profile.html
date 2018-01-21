@@ -1,0 +1,26 @@
+<ion-toolbar>
+    <ion-title>{{profile.name}}</ion-title>
+    <ion-buttons end>
+        <button nav-pop>
+            <ion-icon [name]="'close'" (click)="closeModal()"></ion-icon>
+        </button>
+    </ion-buttons>
+</ion-toolbar>
+<ion-content padding>
+    <ion-thumbnail item-start>
+        <img src="assets/img/profile.png" [hidden]="profile.lowres_img_url">
+        <img [src]="profile.lowres_img_url" [hidden]="!profile.lowres_img_url">
+    </ion-thumbnail>
+    <p>{{profile.free_text}}</p>
+    <ion-list>
+        <ion-item *ngFor="let insertion of insertions" (click)="presentInsertionModal(insertion.id)">
+            <ion-avatar item-start>
+                <img src="assets/img/offerIcon.png" [hidden]="insertion.type!='request'">
+                <img src="assets/img/offerIcon.png" [hidden]="insertion.type!='offer'">
+                <img src="assets/img/publicIcon.png" [hidden]="insertion.type!='public'">
+            </ion-avatar>
+            <h2>{{insertion.title}}</h2>
+            <p>{{insertion.description}}</p>
+        </ion-item>
+    </ion-list>
+</ion-content>

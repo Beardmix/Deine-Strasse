@@ -1,0 +1,28 @@
+<ion-toolbar>
+    <ion-title>{{chat.title}}</ion-title>
+    <ion-buttons end>
+        <button nav-pop>
+      <ion-icon [name]="'close'" (click)="closeModal()"></ion-icon>
+    </button>
+    </ion-buttons>
+</ion-toolbar>
+<ion-content padding>
+    <ion-list>
+        <ion-item *ngFor="let message of messages" [ngClass]="{'currentUser': message.userid==currentUser.id, 'otherUser' : message.userid!=currentUser.id}">
+            <ion-avatar item-start [hidden]="message.userid==currentUser.id">
+                <img src="{{getPicture(message.userid)}}">
+            </ion-avatar>
+            <ion-avatar item-end [hidden]="message.userid!=currentUser.id">
+                <img src="{{getPicture(message.userid)}}">
+            </ion-avatar>
+            <h2>{{message.username}}</h2>
+            <p>{{message.text}}</p>
+        </ion-item>
+    </ion-list>
+    <ion-item>
+        <ion-textarea placeholder="Write your lovely text here" [(ngModel)]="newmessage.text"></ion-textarea>
+    </ion-item>
+    <button ion-button icon-only (click)="sendMessage()">
+        <ion-icon name="md-send"></ion-icon>
+    </button>
+</ion-content>

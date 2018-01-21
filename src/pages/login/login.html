@@ -1,0 +1,25 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>
+            Deine-Straße
+        </ion-title>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+    <h1>Login</h1>
+    <form (ngSubmit)="signIn()">
+        <ion-item>
+            <ion-label>E-Mail</ion-label>
+            <ion-input [(ngModel)]="signin.email" name="email" type="email"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Password</ion-label>
+            <ion-input [(ngModel)]="signin.password" name="password" type="password"></ion-input>
+        </ion-item>
+        <div id="sign-in">
+            <button ion-button type="submit" round outline>Sign-in / up</button>
+        </div>
+    </form>
+</ion-content>

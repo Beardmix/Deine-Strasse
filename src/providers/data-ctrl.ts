@@ -23,7 +23,7 @@ import { log } from 'util';
 export class DataCtrlProvider {
 
     private observUser: any;
-    api: PublicAPI;
+    private api: PublicAPI;
 
     constructor(private model: DataModel, private storage: Storage, private http: Http) {
         Logger.info(this, 'Hello from Constructor');
@@ -42,10 +42,9 @@ export class DataCtrlProvider {
                     return this.api.entryList('person', { mail: email });
                 })
                 .then((list) => {
-                    list.map((entry) => {
-                        Logger.debug(this, 'User Fetched', entry);
-                        DataModel.currentUser.initialise(entry);
-                    });
+                    let user = list.getAllItems()[0];
+                    Logger.debug(this, 'User Fetched', user);
+                    DataModel.currentUser.initialise(user);
                     this.observUser.connect();
                     resolve();
                 })
@@ -62,7 +61,8 @@ export class DataCtrlProvider {
             this.api = new PublicAPI('ac49925a', 'live', true);
             this.api.setClientID('rest');
             this.api.login(email, password)
-                .then(() => {
+                .then((token) => {
+                    console.log(token);
                     resolve();
                 }).catch((err) => {
                     reject(err);

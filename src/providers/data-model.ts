@@ -13,6 +13,8 @@ import { Logger } from './logger-prov';
 @Injectable()
 export class DataModel {
 
+    private static TAG_USERID = "USERID";
+
     static insertions: Datalist<Insertion> = new Datalist<Insertion>("insertion");
     static users: Datalist<User> = new Datalist<User>("person");
     static chats: Datalist<Chat> = new Datalist<Chat>("chats");
@@ -21,24 +23,52 @@ export class DataModel {
 
     static currentUser: User = null;
 
+    static storage: Storage;
+
     static bounds: {
         southwest: { lat: number, lng: number },
         northeast: { lat: number, lng: number }
     };
 
-    constructor(private storage: Storage) {
+    constructor() {
         Logger.info(this, 'Hello from Constructor');
         DataModel.currentUser = new User();
-
-        this.storage.ready().then(() => {
-            // this.currentUser.store(this.storage);
-            // this.currentUser.restore("HJlxyBUNo9g", this.storage);
-        });
 
         DataModel.bounds = {
             southwest: { lat: 0, lng: 0 },
             northeast: { lat: 0, lng: 0 }
         };
+    }
+
+    static storeLoginData() {
+        DataModel.storage.ready()
+        .then(() => {
+            DataModel.storage.set(DataModel.TAG_USERID, DataModel.currentUser.id);
+        }).catch((err) => {
+            Logger.error(this, 'Error Storing the current user', err);
+        });
+    }
+
+    static restoreCurrentUser() {
+        DataModel.storage.ready()
+        .then(() => {
+            return DataModel.storage.get(DataModel.TAG_USERID)
+        })
+        .then((val) => {
+            // Just SAVE / LOAD the userID but not the user values for now.
+            if(val != null)
+            {
+                console.log("known user", val);
+                
+            }
+            else{
+                console.log("no user yet");
+                
+            }
+            
+        }).catch((err) => {
+            Logger.error(this, 'Error Storing the current user', err);
+        });
     }
 
 }

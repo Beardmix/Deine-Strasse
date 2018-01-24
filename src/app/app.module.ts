@@ -22,6 +22,7 @@ import { DataModel } from '../providers/data-model';
 import { ModalInsertionComponent } from '../components/modal-insertion/modal-insertion';
 import { ModalProfileComponent } from '../components/modal-profile/modal-profile';
 import { Logger } from '../providers/logger-prov';
+import { Utils } from '../providers/utils-prov';
 import { ConnectivityProvider } from '../providers/connectivity-prov';
 import { MapProvider } from '../providers/map-prov';
 
@@ -74,6 +75,7 @@ import { ModalInsertionFieldsComponent } from '../components/modal-insertion-fie
         DataCtrlProvider,
         DataModel,
         Logger,
+        Utils,
         ConnectivityProvider,
         MapProvider,
         Network

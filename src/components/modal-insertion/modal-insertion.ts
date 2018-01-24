@@ -7,6 +7,7 @@ import { InsertionsProvider } from '../../providers/insertions-prov';
 import { UsersProvider } from '../../providers/users-prov';
 import { ChatsProvider } from '../../providers/chats-prov';
 import { Logger } from '../../providers/logger-prov';
+import { Utils } from '../../providers/utils-prov';
 
 @Component({
     selector: 'modal-insertion',
@@ -105,19 +106,16 @@ export class ModalInsertionComponent {
         signin_loading.present();
 
         // timeout to simulate saving
-        setTimeout(() => { 
+        Utils.rand_delay(2000)
+        .then(() => {
             signin_loading.dismiss();
             this.editing = false;
-        }, 2000);
-        // Save
-        // .then(() => {
-        //     signin_loading.dismiss();
-        //     this.editing = false;
-        // })
-        // .catch(err => {
-        //     Logger.error(this, 'updateInsertion', err);
-        //     // TODO: add pop-up or toaster signaling the problem.
-        // })
+        })
+        .catch(err => {
+            signin_loading.dismiss();
+            Logger.error(this, 'updateInsertion', err);
+            // TODO: add pop-up or toaster signaling the problem.
+        })
     }
 
 }

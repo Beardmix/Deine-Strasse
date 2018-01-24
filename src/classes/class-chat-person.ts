@@ -7,6 +7,9 @@ import {AbstractModelType} from "./class-abstract";
  * Only simple conversions are recommended here.
  */
 export class ChatPerson extends AbstractModelType{
+    clone(objectDest: AbstractModelType): void {
+        throw new Error("Method not implemented.");
+    }
     id_chat: string;
     id_user: string;
     push: boolean = false;

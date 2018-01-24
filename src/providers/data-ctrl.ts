@@ -125,6 +125,7 @@ export class DataCtrlProvider {
                         });                        
 
                         // Merges arrays to keep the results in cache
+                        // Todo: Does not work as the modeldata is passed by argument so not updated in the Model
                         list.forEach(elem => {
                             let overwritten = false;
                             modeldata.data.forEach(data => {
@@ -163,7 +164,7 @@ export class DataCtrlProvider {
 
             modeldata.data.forEach(entry => {
                 if (entry.id == filters.id) {
-                    element = entry;
+                    entry.clone(element);
                     isFound = true;
                 }
             });

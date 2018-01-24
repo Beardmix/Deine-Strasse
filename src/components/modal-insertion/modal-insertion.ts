@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavParams, ViewController, ModalController } from 'ionic-angular';
+import { NavParams, ViewController, ModalController, LoadingController } from 'ionic-angular';
 import { ModalChatComponent } from '../../components/modal-chat/modal-chat';
 import { Insertion } from '../../classes/class-insertion';
 import { User } from '../../classes/class-user';
@@ -22,22 +22,30 @@ export class ModalInsertionComponent {
     updateDate: string = "";
     profile: User = new User();
     distance: string;
+    currentUser: User = new User();
+    editing:boolean = false;
 
     constructor(
         public params: NavParams, 
         public viewCtrl: ViewController, 
         private insertionsProv: InsertionsProvider, 
         public modalCtrl: ModalController,
+        public loadingCtrl: LoadingController,
         private usersProv: UsersProvider,
         private chatsProv: ChatsProvider) {
 
         // InsertionID as received by parameter
-        var insertionID = params.get('insertionId');
+        let insertionID = params.get('insertionId');
         Logger.debug(this, 'insertionId', insertionID);
 
         // Gets the insertion thanks to its ID
-        insertionsProv.getInsertion(insertionID)
+        this.usersProv.getCurrentUser()
+            .then(currentUser => {
+                this.currentUser = currentUser;
+                return insertionsProv.getInsertion(insertionID);
+            })
             .then(insertion => {
+                Logger.debug(this, 'insertion received', insertion);
                 // copy the received insertion to the display
                 this.insertion = insertion;
                 var date = insertion.end; 
@@ -82,6 +90,34 @@ export class ModalInsertionComponent {
     public closeModal() {
         let returnData = {};
         this.viewCtrl.dismiss(returnData);
+    }
+
+
+    public editInsertion() {
+        this.editing = true;
+    }
+
+    public updateInsertion() {
+        // TODO: Save the dirty object
+        let signin_loading = this.loadingCtrl.create({
+            content: 'Saving...'
+        });
+        signin_loading.present();
+
+        // timeout to simulate saving
+        setTimeout(() => { 
+            signin_loading.dismiss();
+            this.editing = false;
+        }, 2000);
+        // Save
+        // .then(() => {
+        //     signin_loading.dismiss();
+        //     this.editing = false;
+        // })
+        // .catch(err => {
+        //     Logger.error(this, 'updateInsertion', err);
+        //     // TODO: add pop-up or toaster signaling the problem.
+        // })
     }
 
 }

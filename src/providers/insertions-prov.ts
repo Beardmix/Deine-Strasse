@@ -48,7 +48,7 @@ export class InsertionsProvider {
         return this.dataCtrl.fetchElement<Insertion>(Insertion, DataModel.insertions, { id: insertionID });
     }
 
-    public addInsertion(insertion: Insertion): Promise<{}> {
+    public addInsertion(insertion: Insertion): Promise<Insertion> {
         return new Promise((resolve, reject) => {
             this.dataCtrl.getCurrentUser()
                 .then(currentUser => {
@@ -66,5 +66,9 @@ export class InsertionsProvider {
                     reject(err);
                 });
         });
+    }
+
+    public updateInsertion(insertion: Insertion): Promise<Insertion> {
+        return this.dataCtrl.updateData<Insertion>(Insertion, DataModel.insertions, insertion);
     }
 }

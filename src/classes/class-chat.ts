@@ -1,6 +1,6 @@
-import {Message} from "./class-message";
-import {User} from "./class-user";
-import {AbstractModelType} from "./class-abstract"; 
+import { Message } from "./class-message";
+import { User } from "./class-user";
+import { AbstractModelType } from "./class-abstract";
 
 /**
  * Class to define a chat Type.
@@ -8,10 +8,8 @@ import {AbstractModelType} from "./class-abstract";
  * The attributes defined here are known before runtime and permits easier debugging.
  * Only simple conversions are recommended here.
  */
-export class Chat extends AbstractModelType{
-    clone(objectDest: AbstractModelType): void {
-        throw new Error("Method not implemented.");
-    }
+export class Chat extends AbstractModelType {
+    id: string;
     title: string;
     messages: Message[];
     activePersons: string[];
@@ -33,7 +31,15 @@ export class Chat extends AbstractModelType{
         this.activeusers = [];
     }
 
-    toDBJSON():{} {
+    clone(objectDest: Chat): void {
+        objectDest.title = this.title;
+        objectDest.id = this.id;
+        objectDest.messages = this.messages;
+        objectDest.activePersons = this.activePersons;
+        objectDest.activeusers = this.activeusers;
+    }
+
+    toDBJSON(): {} {
         var objectJSON = {
             title: this.title
         };

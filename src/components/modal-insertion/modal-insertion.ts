@@ -58,13 +58,10 @@ export class ModalInsertionComponent {
             .then(profile => {
                 // copy the received profile to the display
                 this.profile = profile;
-                this.usersProv.getDistanceToUser(profile)
-                    .then(distance => {
-                        this.distance = distance;
-                    })
-                    .catch(err => {
-                        Logger.error(this, 'getInsertion', err);
-                    });
+                return this.usersProv.getDistanceToUser(profile);
+            })
+            .then(distance => {
+                this.distance = distance;
             })
             .catch(err => {
                 Logger.error(this, 'getInsertion', err);
@@ -106,9 +103,10 @@ export class ModalInsertionComponent {
         });
         signin_loading.present();
 
-        // timeout to simulate saving
-        Utils.rand_delay(2000)
-            .then(() => {
+
+        this.insertionsProv.updateInsertion(this.insertion)
+            .then((insertion) => {
+                this.insertion = insertion;
                 signin_loading.dismiss();
                 this.editing = false;
             })

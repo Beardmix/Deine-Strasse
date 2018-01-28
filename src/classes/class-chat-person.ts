@@ -7,9 +7,6 @@ import {AbstractModelType} from "./class-abstract";
  * Only simple conversions are recommended here.
  */
 export class ChatPerson extends AbstractModelType{
-    clone(objectDest: AbstractModelType): void {
-        throw new Error("Method not implemented.");
-    }
     id_chat: string;
     id_user: string;
     push: boolean = false;
@@ -30,6 +27,13 @@ export class ChatPerson extends AbstractModelType{
         this.id_user = chatperson.person.id;
         this.push = chatperson.push;
         this.unread = chatperson.unread;
+    }
+
+    clone(objectDest: ChatPerson): void {
+        objectDest.id_chat = this.id_chat;
+        objectDest.id_user = this.id_user;
+        objectDest.push = this.push;
+        objectDest.unread = this.unread;
     }
 
     toDBJSON():{} {

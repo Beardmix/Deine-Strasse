@@ -1,4 +1,4 @@
-import {AbstractModelType} from "./class-abstract"; 
+import { AbstractModelType } from "./class-abstract";
 
 /**
  * Class to define a message Type.
@@ -6,10 +6,7 @@ import {AbstractModelType} from "./class-abstract";
  * The attributes defined here are known before runtime and permits easier debugging.
  * Only simple conversions are recommended here.
  */
-export class Message extends AbstractModelType{
-    clone(objectDest: AbstractModelType): void {
-        throw new Error("Method not implemented.");
-    }
+export class Message extends AbstractModelType {
     text: string;
     chatID: string;
     username: string;
@@ -28,12 +25,19 @@ export class Message extends AbstractModelType{
     initialise(message) {
         this.id = message._id;
         this.text = message.message;
-        this.chatID = message.chat.id;
-        this.userid = message.person.id;
+        this.chatID = message.chat ? message.chat.id : "";
+        this.userid = message.person ? message.person.id : "";
         this.username = "";
     }
 
-    toDBJSON():{} {
+    clone(objectDest: Message): void {
+        objectDest.text = this.text;
+        objectDest.chatID = this.chatID;
+        objectDest.username = this.username;
+        objectDest.userid = this.userid;
+    }
+
+    toDBJSON(): {} {
         var objectJSON = {
             message: this.text,
             chat: this.chatID,

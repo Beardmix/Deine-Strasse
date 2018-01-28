@@ -134,12 +134,11 @@ export class DataCtrlProvider {
                         });
 
                         // Merges arrays to keep the results in cache
-                        // Todo: Does not work as the modeldata is passed by argument so not updated in the Model
                         list.forEach(elem => {
                             let overwritten = false;
                             modeldata.data.forEach(data => {
                                 if (elem.id == data.id) {
-                                    data = elem;
+                                    elem.clone(data);
                                     overwritten = true;
                                 }
                             })
@@ -205,6 +204,36 @@ export class DataCtrlProvider {
         else {
             return null;
         }
+    }
+
+    public updateData<Type extends AbstractModelType>(
+        type: { new(): Type; },
+        modeldata: Datalist<Type>,
+        object: Type): Promise<Type> {
+        return new Promise((resolve, reject) => {
+            var objectJSON = object.toDBJSON();
+            this.api.entry(modeldata.name, object.id)
+                .then((entry) => {
+                    for (var key in objectJSON) {
+                        if (objectJSON.hasOwnProperty(key)) {
+                            entry[key] = objectJSON[key];
+                        }
+                    }
+                    return entry.save();
+                })
+                .then((entry) => {
+                    let element: Type = new type();
+                    element.initialise(entry);
+                    modeldata.data.forEach(obj => {
+                        if (obj.id == element.id) {
+                            obj = element;
+                        }
+                    });
+                    resolve(element);
+                }).catch((err) => {
+                    reject(err)
+                });
+        });
     }
 
     public createData<Type extends AbstractModelType>(

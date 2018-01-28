@@ -4,6 +4,9 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { Logger } from '../../providers/logger-prov';
 
+import { DataModel } from '../../providers/data-model';
+import { DataCtrlProvider } from '../../providers/data-ctrl';
+
 import { LoginPage } from "../login/login";
 import { ChatsPage } from "../chats/chats";
 import { ListPage } from "../list/list";
@@ -22,8 +25,16 @@ export class TabsPage {
 
     constructor(
         public modalCtrl: ModalController,
-        private splashScreen: SplashScreen) {
-        this.presentsignInModal();
+        private splashScreen: SplashScreen,
+        private dataCtrl: DataCtrlProvider) {
+
+        DataModel.restoreLoginData()
+            .then((data) => {
+                this.dataCtrl.loginWithToken(data);
+                this.splashScreen.hide();
+            }).catch((err) => {
+                this.presentsignInModal();
+            });
     }
 
     presentsignInModal() {

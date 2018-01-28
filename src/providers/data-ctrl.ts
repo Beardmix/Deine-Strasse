@@ -6,7 +6,7 @@ import { PublicAPI } from 'ec.sdk';
 import { Http } from '@angular/http';
 import { Observable } from 'rxjs';
 
-import { DataModel } from './data-model'
+import { DataModel } from './data-model';
 import { Logger } from './logger-prov';
 
 import { AbstractModelType } from '../classes/class-abstract';
@@ -35,12 +35,32 @@ export class DataCtrlProvider {
             .publish();
     };
 
-    public login(email, password): Promise<{}> {
+    public loginWithToken(data: any) {
+        this.connectToDatamager();
+        this.api.setToken(data.token);
+        this.fetchUserOnline(data.email);
+    }
+
+    public loginWithEmail(email, password): Promise<{}> {
         return new Promise((resolve, reject) => {
-            this.connectToDatamager(email, password)
-                .then(() => {
-                    return this.api.entryList('person', { mail: email });
+            this.connectToDatamager();
+            this.api.login(email, password)
+                .then((token) => {
+                    DataModel.storeLoginData(email, token);
+                    return this.fetchUserOnline(email);
                 })
+                .then(() => {
+                    resolve();
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    private fetchUserOnline(email: string): Promise<{}> {
+        return new Promise((resolve, reject) => {
+            this.api.entryList('person', { mail: email })
                 .then((list) => {
                     let user = list.getAllItems()[0];
                     Logger.debug(this, 'User Fetched', user);
@@ -54,20 +74,9 @@ export class DataCtrlProvider {
         });
     }
 
-    private connectToDatamager(email, password): Promise<{}> {
-
-        return new Promise((resolve, reject) => {
-
-            this.api = new PublicAPI('ac49925a', 'live', true);
-            this.api.setClientID('rest');
-            this.api.login(email, password)
-                .then((token) => {
-                    console.log(token);
-                    resolve();
-                }).catch((err) => {
-                    reject(err);
-                });
-        });
+    private connectToDatamager() {
+        this.api = new PublicAPI('ac49925a', 'live', false);
+        this.api.setClientID('rest');
     }
 
 
@@ -122,7 +131,7 @@ export class DataCtrlProvider {
                             let element: Type = new type();
                             element.initialise(entry);
                             list.push(element);
-                        });                        
+                        });
 
                         // Merges arrays to keep the results in cache
                         // Todo: Does not work as the modeldata is passed by argument so not updated in the Model
@@ -223,7 +232,7 @@ export class DataCtrlProvider {
     public fetchInsertions(filters = null, forceRefresh: boolean = false): Promise<Array<Insertion>> {
         var options = {
             size: 0,
-            latitude: { 
+            latitude: {
                 from: DataModel.bounds.southwest.lat,
                 to: DataModel.bounds.northeast.lat
             },

@@ -23,9 +23,9 @@ export class LoginPage {
 
     constructor(
         public navCtrl: NavController,
-        public viewCtrl: ViewController, 
+        public viewCtrl: ViewController,
         public loadingCtrl: LoadingController,
-        public dataCtrl: DataCtrlProvider, 
+        public dataCtrl: DataCtrlProvider,
         public navParams: NavParams) {
 
     }
@@ -41,15 +41,15 @@ export class LoginPage {
         signin_loading.present();
 
         // code here
-        this.dataCtrl.login(this.signin.email, this.signin.password)
-        .then(() => {
-            signin_loading.dismiss();
-            this.dismiss();
-        })
-        .catch((err) => {
-            Logger.error(this, 'Sign In Error', err);
-            signin_loading.dismiss();
-        });
+        this.dataCtrl.loginWithEmail(this.signin.email, this.signin.password)
+            .then(() => {
+                signin_loading.dismiss();
+                this.dismiss();
+            })
+            .catch((err) => {
+                Logger.error(this, 'Sign In Error', err);
+                signin_loading.dismiss();
+            });
 
     }
 

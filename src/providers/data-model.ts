@@ -13,7 +13,7 @@ import { Logger } from './logger-prov';
 @Injectable()
 export class DataModel {
 
-    private static TAG_USERID = "USERID";
+    private static TAG_LOGIN_DATA = "TAG_LOGIN_DATA";
 
     static insertions: Datalist<Insertion> = new Datalist<Insertion>("insertion");
     static users: Datalist<User> = new Datalist<User>("person");
@@ -23,7 +23,7 @@ export class DataModel {
 
     static currentUser: User = null;
 
-    static storage: Storage;
+    static storage: Storage = null;
 
     static bounds: {
         southwest: { lat: number, lng: number },
@@ -38,36 +38,45 @@ export class DataModel {
             southwest: { lat: 0, lng: 0 },
             northeast: { lat: 0, lng: 0 }
         };
-    }
 
-    static storeLoginData() {
-        DataModel.storage.ready()
-        .then(() => {
-            DataModel.storage.set(DataModel.TAG_USERID, DataModel.currentUser.id);
-        }).catch((err) => {
-            Logger.error(this, 'Error Storing the current user', err);
+        DataModel.storage = new Storage({
+            name: '_ionicstorage',
+            storeName: '_ionickv',
+            driverOrder: ['sqlite', 'indexeddb', 'websql', 'localstorage']
         });
     }
 
-    static restoreCurrentUser() {
+    static storeLoginData(email: string, token: string) {
         DataModel.storage.ready()
-        .then(() => {
-            return DataModel.storage.get(DataModel.TAG_USERID)
-        })
-        .then((val) => {
-            // Just SAVE / LOAD the userID but not the user values for now.
-            if(val != null)
-            {
-                console.log("known user", val);
-                
-            }
-            else{
-                console.log("no user yet");
-                
-            }
-            
-        }).catch((err) => {
-            Logger.error(this, 'Error Storing the current user', err);
+            .then(() => {
+                var data = {
+                    email: email,
+                    token: token
+                }
+                DataModel.storage.set(DataModel.TAG_LOGIN_DATA, data);
+            }).catch((err) => {
+                Logger.error(this, 'Error Storing the login data', err);
+            });
+    }
+
+    static restoreLoginData(): Promise<{}> {
+
+        return new Promise((resolve, reject) => {
+            DataModel.storage.ready()
+                .then(() => {
+                    return DataModel.storage.get(DataModel.TAG_LOGIN_DATA)
+                })
+                .then((data) => {
+                    if (data != null && data.token != null && data.email != null) {
+                        resolve(data);
+                    }
+                    else {
+                        reject();
+                    }
+                }).catch((err) => {
+                    Logger.error(this, 'Error restoring the login data', err);
+                    reject();
+                });
         });
     }
 

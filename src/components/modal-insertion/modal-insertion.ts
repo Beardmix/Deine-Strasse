@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavParams, ViewController, ModalController } from 'ionic-angular';
+import { NavParams, ViewController, ModalController, LoadingController, ToastController } from 'ionic-angular';
 import { ModalChatComponent } from '../../components/modal-chat/modal-chat';
 import { Insertion } from '../../classes/class-insertion';
 import { User } from '../../classes/class-user';
@@ -7,6 +7,7 @@ import { InsertionsProvider } from '../../providers/insertions-prov';
 import { UsersProvider } from '../../providers/users-prov';
 import { ChatsProvider } from '../../providers/chats-prov';
 import { Logger } from '../../providers/logger-prov';
+import { Utils } from '../../providers/utils-prov';
 
 @Component({
     selector: 'modal-insertion',
@@ -22,25 +23,35 @@ export class ModalInsertionComponent {
     updateDate: string = "";
     profile: User = new User();
     distance: string;
+    currentUser: User = new User();
+    editing: boolean = false;
+    was_edited: boolean = false;
 
     constructor(
-        public params: NavParams, 
-        public viewCtrl: ViewController, 
-        private insertionsProv: InsertionsProvider, 
+        public params: NavParams,
+        public viewCtrl: ViewController,
+        private insertionsProv: InsertionsProvider,
         public modalCtrl: ModalController,
+        public loadingCtrl: LoadingController,
         private usersProv: UsersProvider,
-        private chatsProv: ChatsProvider) {
+        private chatsProv: ChatsProvider,
+        private toastCtrl: ToastController) {
 
         // InsertionID as received by parameter
-        var insertionID = params.get('insertionId');
+        let insertionID = params.get('insertionId');
         Logger.debug(this, 'insertionId', insertionID);
 
         // Gets the insertion thanks to its ID
-        insertionsProv.getInsertion(insertionID)
+        this.usersProv.getCurrentUser()
+            .then(currentUser => {
+                this.currentUser = currentUser;
+                return insertionsProv.getInsertion(insertionID);
+            })
             .then(insertion => {
+                Logger.debug(this, 'insertion received', insertion);
                 // copy the received insertion to the display
                 this.insertion = insertion;
-                var date = insertion.end; 
+                var date = insertion.end;
                 this.updateDate = "" + date.getDay() + "." + date.getMonth() + "." + date.getFullYear();
 
                 return this.usersProv.getProfilePersonID(insertion.creator);
@@ -48,13 +59,10 @@ export class ModalInsertionComponent {
             .then(profile => {
                 // copy the received profile to the display
                 this.profile = profile;
-                this.usersProv.getDistanceToUser(profile)
-                .then(distance => {
-                    this.distance = distance;
-                })
-                .catch(err => {
-                    Logger.error(this, 'getInsertion', err);
-                });
+                return this.usersProv.getDistanceToUser(profile);
+            })
+            .then(distance => {
+                this.distance = distance;
             })
             .catch(err => {
                 Logger.error(this, 'getInsertion', err);
@@ -63,14 +71,14 @@ export class ModalInsertionComponent {
 
     public startChat() {
         this.chatsProv.startChat(this.insertion.title, this.profile)
-        .then(chat => {
-            this.presentChatModal(chat.id);
-        })
-        .catch(err => {
-            Logger.error(this, 'startChat', err);
-        });
+            .then(chat => {
+                this.presentChatModal(chat.id);
+            })
+            .catch(err => {
+                Logger.error(this, 'startChat', err);
+            });
     }
-    
+
     private presentChatModal(chatID) {
         let profileModal = this.modalCtrl.create(ModalChatComponent, { chatID: chatID });
         profileModal.present();
@@ -80,8 +88,39 @@ export class ModalInsertionComponent {
      * Closes modal and returns appropriate data
      */
     public closeModal() {
-        let returnData = {};
+        let returnData = {was_edited: this.was_edited};
         this.viewCtrl.dismiss(returnData);
+    }
+
+
+    public editInsertion() {
+        this.editing = true;
+    }
+
+    public updateInsertion() {
+        let signin_loading = this.loadingCtrl.create({
+            content: 'Saving...'
+        });
+        signin_loading.present();
+
+
+        this.insertionsProv.updateInsertion(this.insertion)
+            .then((insertion) => {
+                insertion.clone(this.insertion);
+                signin_loading.dismiss();
+                this.editing = false;
+                this.was_edited = true;
+            })
+            .catch(err => {
+                signin_loading.dismiss();
+                Logger.error(this, 'updateInsertion', err);
+                let toast = this.toastCtrl.create({
+                    message: 'Error while saving the changes',
+                    duration: 3000,
+                    position: 'bottom'
+                });
+                toast.present();
+            })
     }
 
 }

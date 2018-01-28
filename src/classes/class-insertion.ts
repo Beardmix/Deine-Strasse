@@ -42,6 +42,20 @@ export class Insertion extends AbstractModelType{
         this.status = insertion.status;
     }
 
+    clone(objectDest: Insertion): void {
+        objectDest.id = this.id;
+        objectDest.creator = this.creator;
+        objectDest.title = this.title;
+        objectDest.description = this.description;
+        objectDest.type = this.type;
+        objectDest.location.lat = this.location.lat;
+        objectDest.location.lng = this.location.lng;
+        objectDest.icon = this.icon;
+        objectDest.start = this.start;
+        objectDest.end = this.end;
+        objectDest.status = this.status;
+    }
+
     toDBJSON():{} {
         var objectJSON = {
             title: this.title,

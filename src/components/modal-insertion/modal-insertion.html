@@ -12,24 +12,46 @@
             <img src="assets/img/offerIcon.png" [hidden]="insertion.type=='public'">
             <img src="assets/img/publicIcon.png" [hidden]="insertion.type!='public'">
         </ion-avatar>
-        <h1>{{insertion.title}}</h1>
+        <h1 *ngIf="editing==false">{{insertion.title}}</h1>
+        <h1 *ngIf="editing==true">
+            <ion-item>
+                <ion-input type="text" value="{{insertion.title}}" [(ngModel)]="insertion.title"></ion-input>
+            </ion-item>
+        </h1>
         <p>Last update: {{updateDate}}</p>
     </ion-item>
     <ion-card-content>
-        <p>{{insertion.description}}</p>
+        <p *ngIf="editing==false">{{insertion.description}}</p>
+        <p *ngIf="editing==true">
+            <ion-item>
+                <ion-input type="text" value="{{insertion.description}}" [(ngModel)]="insertion.description"></ion-input>
+            </ion-item>
+        </p>
     </ion-card-content>
     <ion-item>
         <ion-avatar item-start>
-            <img src="assets/img/profile.png" [hidden]="profile.lowres_img_url">
-            <img [src]="profile.lowres_img_url" [hidden]="!profile.lowres_img_url">
+            <img src="assets/img/profile.png" *ngIf="!profile.lowres_img_url">
+            <img [src]="profile.lowres_img_url" *ngIf="profile.lowres_img_url">
         </ion-avatar>
         <h2>{{profile.name}}</h2>
         <p>Distance: {{distance}}</p>
     </ion-item>
-    <div id="contact">
+    <div id="contact" *ngIf="insertion.creator!=currentUser.personID">
         <button ion-button icon-left round outline (click)="startChat()">
-            <ion-icon name="text"></ion-icon>
+            <ion-icon name="md-text"></ion-icon>
             <div>Contact</div>
+        </button>
+    </div>
+    <div id="contact" *ngIf="(insertion.creator==currentUser.personID)&&(editing==false)">
+        <button ion-button icon-left round outline (click)="editInsertion()">
+            <ion-icon name="md-create"></ion-icon>
+            <div>Edit</div>
+        </button>
+    </div>
+    <div id="contact" *ngIf="(insertion.creator==currentUser.personID)&&(editing==true)">
+        <button ion-button icon-left round outline (click)="updateInsertion()">
+            <ion-icon name="md-checkmark"></ion-icon>
+            <div>Update</div>
         </button>
     </div>
 </ion-content>

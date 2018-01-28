@@ -29,6 +29,13 @@ export class ChatPerson extends AbstractModelType{
         this.unread = chatperson.unread;
     }
 
+    clone(objectDest: ChatPerson): void {
+        objectDest.id_chat = this.id_chat;
+        objectDest.id_user = this.id_user;
+        objectDest.push = this.push;
+        objectDest.unread = this.unread;
+    }
+
     toDBJSON():{} {
         var objectJSON = {
             chat: this.id_chat,

@@ -138,7 +138,7 @@ export class DataCtrlProvider {
                             let overwritten = false;
                             modeldata.data.forEach(data => {
                                 if (elem.id == data.id) {
-                                    data = elem;
+                                    elem.clone(data);
                                     overwritten = true;
                                 }
                             })
@@ -172,7 +172,7 @@ export class DataCtrlProvider {
 
             modeldata.data.forEach(entry => {
                 if (entry.id == filters.id) {
-                    element = entry;
+                    entry.clone(element);
                     isFound = true;
                 }
             });
@@ -194,7 +194,7 @@ export class DataCtrlProvider {
 
         modeldata.data.forEach(entry => {
             if (entry.id == filters.id) {
-                element = entry;
+                entry.clone(element);
                 isFound = true;
             }
         });
@@ -204,6 +204,36 @@ export class DataCtrlProvider {
         else {
             return null;
         }
+    }
+
+    public updateData<Type extends AbstractModelType>(
+        type: { new(): Type; },
+        modeldata: Datalist<Type>,
+        object: Type): Promise<Type> {
+        return new Promise((resolve, reject) => {
+            var objectJSON = object.toDBJSON();
+            this.api.entry(modeldata.name, object.id)
+                .then((entry) => {
+                    for (var key in objectJSON) {
+                        if (objectJSON.hasOwnProperty(key)) {
+                            entry[key] = objectJSON[key];
+                        }
+                    }
+                    return entry.save();
+                })
+                .then((entry) => {
+                    let element: Type = new type();
+                    element.initialise(entry);
+                    modeldata.data.forEach(obj => {
+                        if (obj.id == element.id) {
+                            element.clone(obj);
+                        }
+                    });
+                    resolve(element);
+                }).catch((err) => {
+                    reject(err)
+                });
+        });
     }
 
     public createData<Type extends AbstractModelType>(

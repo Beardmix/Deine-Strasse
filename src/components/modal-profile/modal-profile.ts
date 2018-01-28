@@ -21,9 +21,9 @@ export class ModalProfileComponent {
     insertions: Insertion[] = [];
 
     constructor(
-        public params: NavParams, 
+        public params: NavParams,
         public modalCtrl: ModalController,
-        public viewCtrl: ViewController, 
+        public viewCtrl: ViewController,
         private insertionsProv: InsertionsProvider,
         private usersProv: UsersProvider) {
 
@@ -36,7 +36,7 @@ export class ModalProfileComponent {
             .then(profile => {
                 // copy the received profile to the display
                 this.profile = profile;
-                return this.insertionsProv.getInsertions({personID: this.profile.personID}); 
+                return this.insertionsProv.getInsertions({ personID: this.profile.personID });
             })
             .then(insertions => {
                 Logger.debug(this, 'insertions for the user received', insertions);
@@ -60,8 +60,20 @@ export class ModalProfileComponent {
      * Presents the insertion modal when clicked on a list element
      * @param insertionId ID of the insertion to display
      */
-    presentInsertionModal(insertionId) {
+    presentInsertionModal(insertionId: string) {
         let profileModal = this.modalCtrl.create(ModalInsertionComponent, { insertionId: insertionId });
+        profileModal.onDidDismiss(data => {
+            if (data.was_edited == true) {
+                this.insertionsProv.getInsertion(insertionId)
+                    .then(updatedInsertion => {
+                        this.insertions.forEach(insertion => {
+                            if (insertion.id == insertionId) {
+                                updatedInsertion.clone(insertion);
+                            }
+                        });
+                    })
+            }
+        });
         profileModal.present();
     }
 

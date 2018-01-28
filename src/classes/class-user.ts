@@ -32,6 +32,16 @@ export class User extends AbstractModelType{
         this.location.lat = person.latitude;
         this.location.lng = person.longitude;
     }
+    
+    clone(objectDest: User): void {
+        objectDest.id = this.id;
+        objectDest.name = this.name;
+        objectDest.personID = this.personID;
+        objectDest.lowres_img_url = this.lowres_img_url;
+        objectDest.free_text = this.free_text;
+        objectDest.location.lat = this.location.lat;
+        objectDest.location.lng = this.location.lng;
+    }
 
     toDBJSON():{} {
         var objectJSON = {

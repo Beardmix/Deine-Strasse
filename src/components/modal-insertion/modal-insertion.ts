@@ -25,6 +25,7 @@ export class ModalInsertionComponent {
     distance: string;
     currentUser: User = new User();
     editing: boolean = false;
+    was_edited: boolean = false;
 
     constructor(
         public params: NavParams,
@@ -87,7 +88,7 @@ export class ModalInsertionComponent {
      * Closes modal and returns appropriate data
      */
     public closeModal() {
-        let returnData = {};
+        let returnData = {was_edited: this.was_edited};
         this.viewCtrl.dismiss(returnData);
     }
 
@@ -97,7 +98,6 @@ export class ModalInsertionComponent {
     }
 
     public updateInsertion() {
-        // TODO: Save the dirty object
         let signin_loading = this.loadingCtrl.create({
             content: 'Saving...'
         });
@@ -106,9 +106,10 @@ export class ModalInsertionComponent {
 
         this.insertionsProv.updateInsertion(this.insertion)
             .then((insertion) => {
-                this.insertion = insertion;
+                insertion.clone(this.insertion);
                 signin_loading.dismiss();
                 this.editing = false;
+                this.was_edited = true;
             })
             .catch(err => {
                 signin_loading.dismiss();

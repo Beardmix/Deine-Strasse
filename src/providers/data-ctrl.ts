@@ -194,7 +194,7 @@ export class DataCtrlProvider {
 
         modeldata.data.forEach(entry => {
             if (entry.id == filters.id) {
-                element = entry;
+                entry.clone(element);
                 isFound = true;
             }
         });
@@ -226,7 +226,7 @@ export class DataCtrlProvider {
                     element.initialise(entry);
                     modeldata.data.forEach(obj => {
                         if (obj.id == element.id) {
-                            obj = element;
+                            element.clone(obj);
                         }
                     });
                     resolve(element);

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavParams, ViewController, ModalController, LoadingController } from 'ionic-angular';
+import { NavParams, ViewController, ModalController, LoadingController, ToastController } from 'ionic-angular';
 import { ModalChatComponent } from '../../components/modal-chat/modal-chat';
 import { Insertion } from '../../classes/class-insertion';
 import { User } from '../../classes/class-user';
@@ -24,16 +24,17 @@ export class ModalInsertionComponent {
     profile: User = new User();
     distance: string;
     currentUser: User = new User();
-    editing:boolean = false;
+    editing: boolean = false;
 
     constructor(
-        public params: NavParams, 
-        public viewCtrl: ViewController, 
-        private insertionsProv: InsertionsProvider, 
+        public params: NavParams,
+        public viewCtrl: ViewController,
+        private insertionsProv: InsertionsProvider,
         public modalCtrl: ModalController,
         public loadingCtrl: LoadingController,
         private usersProv: UsersProvider,
-        private chatsProv: ChatsProvider) {
+        private chatsProv: ChatsProvider,
+        private toastCtrl: ToastController) {
 
         // InsertionID as received by parameter
         let insertionID = params.get('insertionId');
@@ -49,7 +50,7 @@ export class ModalInsertionComponent {
                 Logger.debug(this, 'insertion received', insertion);
                 // copy the received insertion to the display
                 this.insertion = insertion;
-                var date = insertion.end; 
+                var date = insertion.end;
                 this.updateDate = "" + date.getDay() + "." + date.getMonth() + "." + date.getFullYear();
 
                 return this.usersProv.getProfilePersonID(insertion.creator);
@@ -58,12 +59,12 @@ export class ModalInsertionComponent {
                 // copy the received profile to the display
                 this.profile = profile;
                 this.usersProv.getDistanceToUser(profile)
-                .then(distance => {
-                    this.distance = distance;
-                })
-                .catch(err => {
-                    Logger.error(this, 'getInsertion', err);
-                });
+                    .then(distance => {
+                        this.distance = distance;
+                    })
+                    .catch(err => {
+                        Logger.error(this, 'getInsertion', err);
+                    });
             })
             .catch(err => {
                 Logger.error(this, 'getInsertion', err);
@@ -72,14 +73,14 @@ export class ModalInsertionComponent {
 
     public startChat() {
         this.chatsProv.startChat(this.insertion.title, this.profile)
-        .then(chat => {
-            this.presentChatModal(chat.id);
-        })
-        .catch(err => {
-            Logger.error(this, 'startChat', err);
-        });
+            .then(chat => {
+                this.presentChatModal(chat.id);
+            })
+            .catch(err => {
+                Logger.error(this, 'startChat', err);
+            });
     }
-    
+
     private presentChatModal(chatID) {
         let profileModal = this.modalCtrl.create(ModalChatComponent, { chatID: chatID });
         profileModal.present();
@@ -107,15 +108,20 @@ export class ModalInsertionComponent {
 
         // timeout to simulate saving
         Utils.rand_delay(2000)
-        .then(() => {
-            signin_loading.dismiss();
-            this.editing = false;
-        })
-        .catch(err => {
-            signin_loading.dismiss();
-            Logger.error(this, 'updateInsertion', err);
-            // TODO: add pop-up or toaster signaling the problem.
-        })
+            .then(() => {
+                signin_loading.dismiss();
+                this.editing = false;
+            })
+            .catch(err => {
+                signin_loading.dismiss();
+                Logger.error(this, 'updateInsertion', err);
+                let toast = this.toastCtrl.create({
+                    message: 'Error while saving the changes',
+                    duration: 3000,
+                    position: 'bottom'
+                });
+                toast.present();
+            })
     }
 
 }
